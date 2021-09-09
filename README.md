@@ -1,28 +1,28 @@
 ggwrap
 ======
-A thin wrapper to produce ggplot2 graphs from Python
+Produce ggplot2 graphs from Python
 
 ## Install
 
 ```shell
-pip install -U .
+# from pypi
+pip install ggwrap
+
+# or from github
+git clone --depth 1 https://github.com/kota7/ggwrap.git
+pip install -U ggwrap
 ```
 
 ## Requirements
 
 - Python 3.5+
-- `Rscript` command and the R environment with `ggplot2` package installed
+- `Rscript` command and R environment with `ggplot2` package installed
 
 ## Functions
 
 - `ggshow`: Draw graph using ggplot2 on R and returns the Image object that you can show on Jupyter notebook
 - `ggwrite`: Draw graph using ggplot2 on R and save it to a file.
 
-
-```python
-%load_ext autoreload
-%autoreload 2
-```
 
 
 ```python
