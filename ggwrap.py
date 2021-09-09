@@ -3,7 +3,7 @@
 import os
 import subprocess
 from tempfile import TemporaryDirectory
-from IPython.display import Image, display
+from IPython.display import Image
 
 class config:
     rscript = "Rscript"
