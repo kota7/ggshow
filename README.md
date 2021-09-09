@@ -1,5 +1,7 @@
 ggwrap
 ======
+[![](https://badge.fury.io/py/ggwrap.svg)](https://badge.fury.io/py/ggwrap)
+
 Produce ggplot2 graphs from Python
 
 ## Install
