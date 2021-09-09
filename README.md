@@ -22,7 +22,7 @@ pip install -U ggwrap
 
 ## Functions
 
-- `ggshow`: Draw graph using ggplot2 on R and returns the Image object that you can show on Jupyter notebook
+- `ggshow`: Draw graph using ggplot2 on R and return the Image object that you can show on Jupyter notebook
 - `ggwrite`: Draw graph using ggplot2 on R and save it to a file.
 
 
