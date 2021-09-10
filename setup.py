@@ -9,7 +9,7 @@ with open(readmefile) as f:
 
 
 setup(
-    name='ggwrap',
+    name='ggshow',
     version='0.1.2',
     description="Draw graphs using R's ggplot2 from Python script and Jupyter notebook",
     author='Kota Mori',
@@ -20,7 +20,7 @@ setup(
     #download_url='',
 
     #packages=find_packages(),
-    py_modules=['ggwrap'],    
+    py_modules=['ggshow'],    
     install_requires=[],
     #test_require=['pytest'],
     package_data={},

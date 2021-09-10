@@ -1,6 +1,6 @@
-ggwrap
+ggshow
 ======
-[![](https://badge.fury.io/py/ggwrap.svg)](https://badge.fury.io/py/ggwrap)
+[![](https://badge.fury.io/py/ggshow.svg)](https://badge.fury.io/py/ggshow)
 
 Produce ggplot2 graphs from Python
 
@@ -8,11 +8,11 @@ Produce ggplot2 graphs from Python
 
 ```shell
 # from pypi
-pip install ggwrap
+pip install ggshow
 
 # or from github
-git clone --depth 1 https://github.com/kota7/ggwrap.git
-pip install -U ggwrap
+git clone --depth 1 https://github.com/kota7/ggshow.git
+pip install -U ./ggshow
 ```
 
 ## Requirements
@@ -28,7 +28,7 @@ pip install -U ggwrap
 
 
 ```python
-from ggwrap import ggshow, ggwrite
+from ggshow import ggshow, ggwrite
 ```
 
 
@@ -109,7 +109,7 @@ Image("foo.jpg", width=400)
 # By default, we use 'Rscript' as the command to run R code.
 # If this is not a valid command on your environment,
 # specify by set_rscript function.
-from ggwrap import config, set_rscript
+from ggshow import config, set_rscript
 
 set_rscript("/usr/bin/Rscript")  
 print(config.rscript)
@@ -121,6 +121,3 @@ print(config.rscript)
 
 
 
-```python
-
-```
