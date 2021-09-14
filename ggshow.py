@@ -3,7 +3,6 @@
 import os
 import subprocess
 from tempfile import TemporaryDirectory
-from IPython.display import Image
 
 class config:
     rscript = "Rscript"
@@ -56,6 +55,7 @@ def ggwrite(plotcode: str, outfile: str, libs=(),
 def ggshow(plotcode: str, dispwidth=300, dispheight=None, libs=(),
            width=None, height=None, scale=1, units="in", dpi=300,
            ggsave_opts: dict={}, **dataframes)-> Image:
+    from IPython.display import Image
     with TemporaryDirectory() as tmpdir:
         outfile = os.path.join(tmpdir, "__ggout.png")
         ggwrite(plotcode, outfile, libs=libs,

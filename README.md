@@ -55,7 +55,7 @@ ggshow("""
 
 ```python
 # Example with data frames
-# pass as data frames as keyword arguments
+# pass pandas data frames as keyword arguments
 # then you can use them in the R code
 import numpy as np
 import pandas as pd
@@ -84,9 +84,9 @@ ggshow("""
 ```python
 # Example to save the graph to a file
 ggwrite("""
-    x <- c(1,2,3)
-    y <- c(4,5,6)
-    qplot(x, y, geom="line")
+  x <- c(1,2,3)
+  y <- c(4,5,6)
+  qplot(x, y, geom="line")
 """, "foo.jpg", width=4, height=2)
 ```
 
@@ -107,8 +107,8 @@ Image("foo.jpg", width=400)
 
 ```python
 # By default, we use 'Rscript' as the command to run R code.
-# If this is not a valid command on your environment,
-# specify by set_rscript function.
+# If this is not a valid command name on your environment,
+# specify the right one by set_rscript function.
 from ggshow import config, set_rscript
 
 set_rscript("/usr/bin/Rscript")  
