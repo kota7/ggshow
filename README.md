@@ -142,7 +142,7 @@ ggplot(a, aes(x, y)) +
   geom_line(color="blue") +
   geom_line(data=b, linetype="dashed", color="red") +
   theme_bw() +
-  ggtitle("Sin and cos waves")
+  ggtitle("Sine and Cosine Waves")
 """
 
 %gg {code} -s 4 2 --dispwidth 400 --data a=df1 b=df2
@@ -166,7 +166,7 @@ ggplot(a, aes(x, y)) +
   geom_line(color="blue") +
   geom_line(data=b, linetype="dashed", color="red") +
   theme_bw() +
-  ggtitle("Sin and cos waves")
+  ggtitle("Sine and Cosine Waves")
 ```
 
 

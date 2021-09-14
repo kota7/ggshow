@@ -3,6 +3,7 @@
 /foo.png
 # helper file for making the readme
 /examples.md
+/examples_files
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
