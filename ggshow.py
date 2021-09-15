@@ -80,7 +80,15 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
                width={width}, height={height}, scale={scale}, units='{units}', dpi={dpi})
         """.format(importcode=importcode, readcode=readcode, plotcode=plotcode,
                    outfile=outfile, width=width, height=height, scale=scale, units=units, dpi=dpi)
-        subprocess.run([config.rscript, "-e", code])
+        p = subprocess.run([config.rscript, "-e", code], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if p.returncode != 0:
+            warnmessage = ("Some error occurred while running the R code. The graph may not have been created."
+                       "\nStdout:\n\n{}\nStderr:\n\n{}\nR code (auto-generated):\n{}").format(
+                           p.stdout.decode(), p.stderr.decode(), code)
+            warnings.warn(warnmessage, RuntimeWarning)                
+        else:
+            print(p.stderr.decode(), file=sys.stderr, end="")
+            print(p.stdout.decode(), file=sys.stdout, end="")
 
 
 def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tuple=(),
@@ -108,6 +116,8 @@ def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tu
         ggwrite(plotcode, outfile, libs=libs,
                 savesize=savesize, width=width, height=height, scale=scale, units=units, dpi=dpi,
                 **data)
+        if not os.path.isfile(outfile):
+            raise RuntimeError("Graph file not found. Perhaps Rscript failed to produce the graph")
         im = Image(filename=outfile, width=dispwidth, height=dispheight)
         return im
 
