@@ -18,12 +18,12 @@ pip install -U ./ggshow
 ## Requirements
 
 - Python 3.5+
-- `Rscript` command and R environment with `ggplot2` package installed
+- `Rscript` command and the R environment with `ggplot2` package installed
 
 ## Functionalities
 
-- `ggshow`: Draw graph using ggplot2 on R and return the Image object that you can show on Jupyter notebook
-- `ggwrite`: Draw graph using ggplot2 on R and save it to a file.
+- `ggshow`: Draw graphs using ggplot2 on R and return the Image object that you can show on Jupyter notebook
+- `ggwrite`: Draw graphs using ggplot2 on R and save it to a file.
 - `%gg`, `%%gg`: ipython magic for drawing ggplot2 graph.
 
 
@@ -48,7 +48,6 @@ ggshow("""
 
     
 <img width=400 src="README_files/examples_2_0.png">
-    
 
 
 
@@ -70,14 +69,15 @@ ggshow("""
     geom_line(color="blue") +
     geom_line(data=b, linetype="dashed", color="red") +
     theme_bw()
-""", dispwidth=400, savesize=(4, 2), a=df1, b=df2)
+""", dispwidth=500, savesize=(4, 2), a=df1, b=df2)
 ```
 
 
 
 
+
     
-<img width=400 src="README_files/examples_3_0.png">
+<img width=500 src="README_files/examples_3_0.png">
     
 
 
@@ -101,10 +101,42 @@ Image("foo.jpg", width=400)
 
 
 
-    
-<img width=400 src="README_files/examples_5_0.jpg">
-    
 
+<img width=400 src="README_files/examples_5_0.jpg">
+
+
+
+```python
+# Example to specify the image file format
+# But there may not be significant differences
+# Default: png
+ggshow("""
+  x <- c(1,2,3)
+  y <- c(4,5,6)
+  qplot(x, y, geom="line") + ggtitle("PNG")
+""", savesize=(3, 2), imageformat="png")
+
+ggshow("""
+  x <- c(1,2,3)
+  y <- c(4,5,6)
+  qplot(x, y, geom="line") + ggtitle("JPEG")
+""", savesize=(3, 2), imageformat="jpeg")
+
+ggshow("""
+  x <- c(1,2,3)
+  y <- c(4,5,6)
+  qplot(x, y, geom="line") + ggtitle("SVG")
+""", savesize=(3, 2), imageformat="svg")
+None
+```
+
+
+<img width=400 src="README_files/examples_6_0.png">
+
+<img width=400 src="README_files/examples_6_1.jpg">
+
+<img width=400 src="README_files/examples_6_2.svg">
+    
 
 
 
@@ -123,7 +155,7 @@ Image("foo.jpg", width=400)
 
 
     
-<img width=400 src="README_files/examples_7_0.png">
+<img width=400 src="README_files/examples_8_0.png">
     
 
 
@@ -152,7 +184,7 @@ ggplot(a, aes(x, y)) +
 
 
     
-<img width=400 src="README_files/examples_8_0.png">
+<img width=400 src="README_files/examples_9_0.png">
     
 
 
@@ -173,7 +205,7 @@ ggplot(a, aes(x, y)) +
 
 
     
-<img width=400 src="README_files/examples_9_0.png">
+<img width=400 src="README_files/examples_10_0.png">
     
 
 

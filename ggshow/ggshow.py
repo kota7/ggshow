@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 try:
     # This try..except avoids errors on an environment with no ipython
     # ggwrite function will still be available
-    from IPython.display import Image
+    from IPython.display import Image, SVG, display_png, display_jpeg, display_svg
 except ImportError as e:
     print("'ggshow' function is disabled. Please import ipython to use it", file=sys.stderr)
 
@@ -40,16 +40,16 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
     Write a ggplot2 graph to a file
 
     args:
-        plotcode :   R script to make a plot.
-        outfile  :   The graph is saved to this filepath
-        libs     :   A Sequence libraries to use inside the R script
-        savesize :   Graph size (width, height) to save
-        width    :   Another way to specify savesize[0]
-        height   :   Another way to specify savesize[1]
-        scale    :   ggsave option scale
-        units    :   ggsave option units
-        dpi      :   ggsave option gpi
-        **data   :   pandas data frames with names used inside the R script
+        plotcode    :   R script to make a plot.
+        outfile     :   The graph is saved to this filepath
+        libs        :   A Sequence libraries to use inside the R script
+        savesize    :   Graph size (width, height) to save
+        width       :   Another way to specify savesize[0]
+        height      :   Another way to specify savesize[1]
+        scale       :   ggsave option scale
+        units       :   ggsave option units
+        dpi         :   ggsave option gpi
+        **data      :   pandas data frames with names used inside the R script
 
     Returns:
         None
@@ -83,7 +83,7 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
         p = subprocess.run([config.rscript, "-e", code], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if p.returncode != 0:
             warnmessage = ("Some error occurred while running the R code. The graph may not have been created."
-                       "\nStdout:\n\n{}\nStderr:\n\n{}\nR code (auto-generated):\n{}").format(
+                           "\nStdout:\n\n{}\nStderr:\n\n{}\nR code (auto-generated):\n{}").format(
                            p.stdout.decode(), p.stderr.decode(), code)
             warnings.warn(warnmessage, RuntimeWarning)                
         else:
@@ -91,34 +91,46 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
             print(p.stdout.decode(), file=sys.stdout, end="")
 
 
-def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tuple=(),
+def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tuple=(), imageformat: str="png", display: bool=True,
            savesize: tuple=None, width: float=None, height: float=None, scale: float=1, units: str="in", dpi: int=300,
            **data)-> Image:
     """
     Draw a ggplot2 graph
 
     args:
-        plotcode :   R script to make a plot.
-        libs     :   A Sequence libraries to use inside the R script
-        savesize :   Graph size (width, height) to save
-        width    :   Another way to specify savesize[0]
-        height   :   Another way to specify savesize[1]
-        scale    :   ggsave option scale
-        units    :   ggsave option units
-        dpi      :   ggsave option gpi
-        **data   :   pandas data frames with names used inside the R script
+        plotcode    :   R script to make a plot.
+        libs        :   A Sequence libraries to use inside the R script
+        imageformat :   Imagefile format. One of ("png", "jpeg", "jpg", "svg"); default: "png"
+        display     :   Display image on the notebook
+        savesize    :   Graph size (width, height) to save
+        width       :   Another way to specify savesize[0]
+        height      :   Another way to specify savesize[1]
+        scale       :   ggsave option scale
+        units       :   ggsave option units
+        dpi         :   ggsave option gpi
+        **data      :   pandas data frames with names used inside the R script
 
     Returns:
         IPython.core.Image
     """
+    assert imageformat in ("png", "jpeg", "jpg", "svg"), "imageformat must be one of 'png', 'jpeg', 'jpg' and 'svg'"
     with TemporaryDirectory() as tmpdir:
-        outfile = os.path.join(tmpdir, "__ggout.png")
+        outfile = os.path.join(tmpdir, "__ggout." + imageformat)
         ggwrite(plotcode, outfile, libs=libs,
                 savesize=savesize, width=width, height=height, scale=scale, units=units, dpi=dpi,
                 **data)
         if not os.path.isfile(outfile):
             raise RuntimeError("Graph file not found. Perhaps Rscript failed to produce the graph")
-        im = Image(filename=outfile, width=dispwidth, height=dispheight)
+        
+        if imageformat in ("png", "jpeg", "jpg"):
+            im = Image(filename=outfile, width=dispwidth, height=dispheight)
+            if display:
+                func = display_png if imageformat=="png" else display_jpeg
+                func(im)
+        elif imageformat == "svg":
+            im = SVG(filename=outfile)
+            if display:
+                display_svg(im)
         return im
 
 
@@ -141,6 +153,7 @@ try:
         @argument("--dpi", type=int, default=300, help="ggsave option dpi")
         @argument("-w", "--dispwidth", type=float, default=None, help="display width")
         @argument("-h", "--dispheight", type=float, default=None, help="display width")
+        @argument("--imageformat", type=str, default="png", choices=("png", "jpeg", "svg"), help="imagefile format")
         @argument("--libs", nargs="*", default=(), help="R libraries to use")
         @argument("--data", nargs="*", default=(), help="data frames mapping as {name in r}={name in python}")
         def gg(self, line, cell=None):
@@ -163,7 +176,7 @@ try:
             if cell is not None:
                 opts["plotcode"] = cell
             
-            return ggshow(**opts)
+            return ggshow(**opts, display=False)
             
     def load_ipython_extension(ipython):
         """

@@ -10,7 +10,7 @@ with open(readmefile) as f:
 
 setup(
     name='ggshow',
-    version='0.1.6',
+    version='0.1.7',
     description="Draw graphs using R's ggplot2 from Python script and Jupyter notebook",
     author='Kota Mori',
     author_email='kmori05@gmail.com',
