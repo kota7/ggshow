@@ -1,4 +1,5 @@
-## ggshow v0.1.7 (Release data: 2022-04-23)
+### ggshow v0.1.7 
+Released: 2022-04-23
 
 
 - `ggshow`
