@@ -5,6 +5,7 @@ import sys
 import subprocess
 import warnings
 from tempfile import TemporaryDirectory
+from pathlib import Path
 
 __version__ = "0.1.8"
 
@@ -73,6 +74,7 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
         if height is None: height = savesize[1]
         if width is None: width = "NA"
         if height is None: height = "NA"
+        outfile = Path(outfile).as_posix()  # this normalizes the path string on windowns
         code = """
         {importcode}
         {readcode}
@@ -83,7 +85,13 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
                width={width}, height={height}, scale={scale}, units='{units}', dpi={dpi})
         """.format(importcode=importcode, readcode=readcode, plotcode=plotcode,
                    outfile=outfile, width=width, height=height, scale=scale, units=units, dpi=dpi)
-        p = subprocess.run([config.rscript, "-e", code], encoding=message_encoding, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #print(code)
+        # write this code to a tempfile to minimize the error
+        with TemporaryDirectory() as tmpdir:
+            codefile = os.path.join(tmpdir, "__ggcode.R")
+            with open(codefile, "w") as f:
+                f.write(code)
+            p = subprocess.run([config.rscript, codefile], encoding=message_encoding, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if p.returncode != 0:
             warnmessage = ("Some error occurred while running the R code. The graph may not have been created."
                            "\nStdout:\n\n{}\nStderr:\n\n{}\nR code (auto-generated):\n{}").format(
