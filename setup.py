@@ -2,7 +2,7 @@
 
 import os
 from setuptools import setup, find_packages
-from ggshow import __version__
+from .ggshow import __version__
 
 readmefile = os.path.join(os.path.dirname(__file__), "README.md")
 with open(readmefile) as f:
