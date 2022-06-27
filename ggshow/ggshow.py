@@ -66,7 +66,7 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
         for name, df in data.items():
              filename = os.path.join(tmpdir, "__data_{}.csv".format(name))
              df.to_csv(filename, index=False)
-             readcode.append("{} <- read.csv('{}', as.is=TRUE)".format(name, filename))
+             readcode.append("{} <- read.csv('{}', as.is=TRUE)".format(name, Path(filename).as_posix()))
         readcode = ";".join(readcode)
 
         if savesize is None: savesize = None, None
@@ -89,7 +89,7 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
         # write this code to a tempfile to minimize the error
         with TemporaryDirectory() as tmpdir:
             codefile = os.path.join(tmpdir, "__ggcode.R")
-            with open(codefile, "w") as f:
+            with open(codefile, "w", encoding="utf-8") as f:
                 f.write(code)
             p = subprocess.run([config.rscript, codefile], encoding=message_encoding, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if p.returncode != 0:
