@@ -6,6 +6,8 @@ import subprocess
 import warnings
 from tempfile import TemporaryDirectory
 
+__version__ = "0.1.8"
+
 try:
     # This try..except avoids errors on an environment with no ipython
     # ggwrite function will still be available
@@ -35,21 +37,22 @@ if not _find_rscript():
 
 def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
             savesize: tuple=None, width: float=None, height: float=None,
-            scale: float=1, units: str="in", dpi: int=300, **data):
+            scale: float=1, units: str="in", dpi: int=300, message_encoding="utf-8", **data):
     """
     Write a ggplot2 graph to a file
 
     args:
-        plotcode    :   R script to make a plot.
-        outfile     :   The graph is saved to this filepath
-        libs        :   A Sequence libraries to use inside the R script
-        savesize    :   Graph size (width, height) to save
-        width       :   Another way to specify savesize[0]
-        height      :   Another way to specify savesize[1]
-        scale       :   ggsave option scale
-        units       :   ggsave option units
-        dpi         :   ggsave option gpi
-        **data      :   pandas data frames with names used inside the R script
+        plotcode         :   R script to make a plot.
+        outfile          :   The graph is saved to this filepath
+        libs             :   A Sequence libraries to use inside the R script
+        savesize         :   Graph size (width, height) to save
+        width            :   Another way to specify savesize[0]
+        height           :   Another way to specify savesize[1]
+        scale            :   ggsave option scale
+        units            :   ggsave option units
+        dpi              :   ggsave option gpi
+        message_encoding :   Character encoding that R uses
+        **data           :   pandas data frames with names used inside the R script
 
     Returns:
         None
@@ -80,35 +83,38 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
                width={width}, height={height}, scale={scale}, units='{units}', dpi={dpi})
         """.format(importcode=importcode, readcode=readcode, plotcode=plotcode,
                    outfile=outfile, width=width, height=height, scale=scale, units=units, dpi=dpi)
-        p = subprocess.run([config.rscript, "-e", code], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.run([config.rscript, "-e", code], encoding=message_encoding, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if p.returncode != 0:
             warnmessage = ("Some error occurred while running the R code. The graph may not have been created."
                            "\nStdout:\n\n{}\nStderr:\n\n{}\nR code (auto-generated):\n{}").format(
-                           p.stdout.decode(), p.stderr.decode(), code)
+                           p.stdout, p.stderr, code)
             warnings.warn(warnmessage, RuntimeWarning)                
         else:
-            print(p.stderr.decode(), file=sys.stderr, end="")
-            print(p.stdout.decode(), file=sys.stdout, end="")
+            print(p.stderr, file=sys.stderr, end="")
+            print(p.stdout, file=sys.stdout, end="")
 
 
-def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tuple=(), imageformat: str="png", display: bool=True,
-           savesize: tuple=None, width: float=None, height: float=None, scale: float=1, units: str="in", dpi: int=300,
+def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tuple=(),
+           imageformat: str="png", display: bool=True,           
+           savesize: tuple=None, width: float=None, height: float=None,
+           scale: float=1, units: str="in", dpi: int=300, message_encoding="utf-8",
            **data)-> Image:
     """
     Draw a ggplot2 graph
 
     args:
-        plotcode    :   R script to make a plot.
-        libs        :   A Sequence libraries to use inside the R script
-        imageformat :   Imagefile format. One of ("png", "jpeg", "jpg", "svg"); default: "png"
-        display     :   Display image on the notebook
-        savesize    :   Graph size (width, height) to save
-        width       :   Another way to specify savesize[0]
-        height      :   Another way to specify savesize[1]
-        scale       :   ggsave option scale
-        units       :   ggsave option units
-        dpi         :   ggsave option gpi
-        **data      :   pandas data frames with names used inside the R script
+        plotcode         :   R script to make a plot.
+        libs             :   A Sequence libraries to use inside the R script
+        imageformat      :   Imagefile format. One of ("png", "jpeg", "jpg", "svg"); default: "png"
+        display          :   Display image on the notebook
+        savesize         :   Graph size (width, height) to save
+        width            :   Another way to specify savesize[0]
+        height           :   Another way to specify savesize[1]
+        scale            :   ggsave option scale
+        units            :   ggsave option units
+        dpi              :   ggsave option gpi
+        message_encoding :   Character encoding that R uses
+        **data           :   pandas data frames with names used inside the R script
 
     Returns:
         IPython.core.Image
@@ -151,8 +157,9 @@ try:
         @argument("--scale", type=float, default=1, help="ggsave option scale")
         @argument("--units", type=str, default="in", help="ggsave option units")
         @argument("--dpi", type=int, default=300, help="ggsave option dpi")
+        @argument("--message_encoding", type=str, default="utf-8", help="Character encoding that R uses")
         @argument("-w", "--dispwidth", type=float, default=None, help="display width")
-        @argument("-h", "--dispheight", type=float, default=None, help="display width")
+        @argument("-h", "--dispheight", type=float, default=None, help="display height")
         @argument("--imageformat", type=str, default="png", choices=("png", "jpeg", "svg"), help="imagefile format")
         @argument("--libs", nargs="*", default=(), help="R libraries to use")
         @argument("--data", nargs="*", default=(), help="data frames mapping as {name in r}={name in python}")

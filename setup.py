@@ -2,15 +2,15 @@
 
 import os
 from setuptools import setup, find_packages
+from ggshow import __version__
 
 readmefile = os.path.join(os.path.dirname(__file__), "README.md")
 with open(readmefile) as f:
     readme = f.read()
 
-
 setup(
     name='ggshow',
-    version='0.1.7',
+    version=__version__,
     description="Draw graphs using R's ggplot2 from Python script and Jupyter notebook",
     author='Kota Mori',
     author_email='kmori05@gmail.com',
