@@ -5,6 +5,7 @@ import sys
 import subprocess
 import warnings
 from tempfile import TemporaryDirectory
+from pathlib import Path
 
 try:
     # This try..except avoids errors on an environment with no ipython
@@ -35,21 +36,22 @@ if not _find_rscript():
 
 def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
             savesize: tuple=None, width: float=None, height: float=None,
-            scale: float=1, units: str="in", dpi: int=300, **data):
+            scale: float=1, units: str="in", dpi: int=300, message_encoding: str="utf-8", **data):
     """
     Write a ggplot2 graph to a file
 
     args:
-        plotcode    :   R script to make a plot.
-        outfile     :   The graph is saved to this filepath
-        libs        :   A Sequence libraries to use inside the R script
-        savesize    :   Graph size (width, height) to save
-        width       :   Another way to specify savesize[0]
-        height      :   Another way to specify savesize[1]
-        scale       :   ggsave option scale
-        units       :   ggsave option units
-        dpi         :   ggsave option gpi
-        **data      :   pandas data frames with names used inside the R script
+        plotcode         :   R script to make a plot.
+        outfile          :   The graph is saved to this filepath
+        libs             :   A Sequence libraries to use inside the R script
+        savesize         :   Graph size (width, height) to save
+        width            :   Another way to specify savesize[0]
+        height           :   Another way to specify savesize[1]
+        scale            :   ggsave option scale
+        units            :   ggsave option units
+        dpi              :   ggsave option gpi
+        message_encoding :   Character encoding of the subprocess outputs
+        **data           :   pandas data frames with names used inside the R script
 
     Returns:
         None
@@ -61,8 +63,9 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
         readcode = []
         for name, df in data.items():
              filename = os.path.join(tmpdir, "__data_{}.csv".format(name))
-             df.to_csv(filename, index=False)
-             readcode.append("{} <- read.csv('{}', as.is=TRUE)".format(name, filename))
+             filename = Path(filename).as_posix()  # normalize the path string on windowns
+             df.to_csv(filename, index=False, encoding="utf8")
+             readcode.append("{} <- read.csv('{}', as.is=TRUE, fileEncoding='utf8')".format(name, filename))
         readcode = ";".join(readcode)
 
         if savesize is None: savesize = None, None
@@ -70,6 +73,7 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
         if height is None: height = savesize[1]
         if width is None: width = "NA"
         if height is None: height = "NA"
+        outfile = Path(outfile).as_posix()  # normalize the path string on windowns
         code = """
         {importcode}
         {readcode}
@@ -80,34 +84,40 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
                width={width}, height={height}, scale={scale}, units='{units}', dpi={dpi})
         """.format(importcode=importcode, readcode=readcode, plotcode=plotcode,
                    outfile=outfile, width=width, height=height, scale=scale, units=units, dpi=dpi)
-        p = subprocess.run([config.rscript, "-e", code], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #code = ascii(code)[1:-1]  # escape multibyte characters in the code [1:-1] to remove the quotes
+        with TemporaryDirectory() as tmpdir:
+            codefile = os.path.join(tmpdir, "__ggcode.R")
+            with open(codefile, "w", encoding="utf-8") as f:
+                f.write(code)
+            p = subprocess.run([config.rscript, codefile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)        
         if p.returncode != 0:
             warnmessage = ("Some error occurred while running the R code. The graph may not have been created."
                            "\nStdout:\n\n{}\nStderr:\n\n{}\nR code (auto-generated):\n{}").format(
                            p.stdout.decode(), p.stderr.decode(), code)
             warnings.warn(warnmessage, RuntimeWarning)                
         else:
-            print(p.stderr.decode(), file=sys.stderr, end="")
-            print(p.stdout.decode(), file=sys.stdout, end="")
+            print(p.stderr.decode(message_encoding, errors="replace"), file=sys.stderr, end="")
+            print(p.stdout.decode(message_encoding, errors="replace"), file=sys.stdout, end="")
 
 
 def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tuple=(), imageformat: str="png", display: bool=True,
            savesize: tuple=None, width: float=None, height: float=None, scale: float=1, units: str="in", dpi: int=300,
-           **data)-> Image:
+           message_encoding: str="utf-8", **data)-> Image:
     """
     Draw a ggplot2 graph
 
     args:
-        plotcode    :   R script to make a plot.
-        libs        :   A Sequence libraries to use inside the R script
-        imageformat :   Imagefile format. One of ("png", "jpeg", "jpg", "svg"); default: "png"
-        display     :   Display image on the notebook
-        savesize    :   Graph size (width, height) to save
-        width       :   Another way to specify savesize[0]
-        height      :   Another way to specify savesize[1]
-        scale       :   ggsave option scale
-        units       :   ggsave option units
-        dpi         :   ggsave option gpi
+        plotcode         :   R script to make a plot.
+        libs             :   A Sequence libraries to use inside the R script
+        imageformat      :   Imagefile format. One of ("png", "jpeg", "jpg", "svg"); default: "png"
+        display          :   Display image on the notebook
+        savesize         :   Graph size (width, height) to save
+        width            :   Another way to specify savesize[0]
+        height           :   Another way to specify savesize[1]
+        scale            :   ggsave option scale
+        units            :   ggsave option units
+        dpi              :   ggsave option gpi
+        message_encoding :   Character encoding of the subprocess outputs
         **data      :   pandas data frames with names used inside the R script
 
     Returns:
@@ -118,7 +128,7 @@ def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tu
         outfile = os.path.join(tmpdir, "__ggout." + imageformat)
         ggwrite(plotcode, outfile, libs=libs,
                 savesize=savesize, width=width, height=height, scale=scale, units=units, dpi=dpi,
-                **data)
+                message_encoding=message_encoding, **data)
         if not os.path.isfile(outfile):
             raise RuntimeError("Graph file not found. Perhaps Rscript failed to produce the graph")
         
