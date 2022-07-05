@@ -27,7 +27,7 @@ jobs:
         r-version: ${{ matrix.r-version }}
     - name: Install R dependencies
       run: |
-        install.packages(c("ggplot2", "dplyr", "tidyr", "dbplyr", "lazyeval", "rlang"))
+        install.packages(c("ggplot2"))
       shell: Rscript {0}
     - name: Install dependencies
       run: |
