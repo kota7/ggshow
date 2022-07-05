@@ -1,6 +1,7 @@
 ggshow
 ======
 [![](https://badge.fury.io/py/ggshow.svg)](https://badge.fury.io/py/ggshow)
+[![Python package](https://github.com/kota7/ggshow/actions/workflows/python-package.yml/badge.svg)](https://github.com/kota7/ggshow/actions/workflows/python-package.yml)
 
 Produce ggplot2 graphs from Python
 
