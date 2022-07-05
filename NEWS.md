@@ -1,3 +1,10 @@
+### ggshow v0.1.8
+Released: 2022-07-05
+
+- `ggshow`, `ggwrite`
+  - `message_encoding` option added to specify the encoding of the subprocess outputs (default: 'utf-8')
+  - Fixed errors on Windows OS 
+
 ### ggshow v0.1.7 
 Released: 2022-04-23
 
