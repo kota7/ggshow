@@ -37,7 +37,8 @@ if not _find_rscript():
 
 def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
             savesize: tuple=None, width: float=None, height: float=None,
-            scale: float=1, units: str="in", dpi: int=300, message_encoding: str="utf-8", **data):
+            scale: float=1, units: str="in", dpi: int=300,
+            rscriptpath: str=None, message_encoding: str="utf-8", **data):
     """
     Write a ggplot2 graph to a file
 
@@ -51,6 +52,7 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
         scale            :   ggsave option scale
         units            :   ggsave option units
         dpi              :   ggsave option gpi
+        rscriptpath      :   If given, used as the path to the Rscript command
         message_encoding :   Character encoding of the subprocess outputs
         **data           :   pandas data frames with names used inside the R script
 
@@ -75,6 +77,9 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
         if width is None: width = "NA"
         if height is None: height = "NA"
         outfile = Path(outfile).as_posix()  # normalize the path string on windowns
+        if rscriptpath is None:
+            rscriptpath = config.rscript
+
         code = """
         {importcode}
         {readcode}
@@ -90,7 +95,7 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
             codefile = os.path.join(tmpdir, "__ggcode.R")
             with open(codefile, "w", encoding="utf-8") as f:
                 f.write(code)
-            p = subprocess.run([config.rscript, codefile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)        
+            p = subprocess.run([rscriptpath, codefile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)        
         if p.returncode != 0:
             warnmessage = ("Some error occurred while running the R code. The graph may not have been created."
                            "\nStdout:\n\n{}\nStderr:\n\n{}\nR code (auto-generated):\n{}").format(
@@ -103,7 +108,7 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
 
 def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tuple=(), imageformat: str="png", display: bool=True,
            savesize: tuple=None, width: float=None, height: float=None, scale: float=1, units: str="in", dpi: int=300,
-           message_encoding: str="utf-8", **data)-> Image:
+           rscriptpath: str=None, message_encoding: str="utf-8", **data)-> Image:
     """
     Draw a ggplot2 graph
 
@@ -118,6 +123,7 @@ def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tu
         scale            :   ggsave option scale
         units            :   ggsave option units
         dpi              :   ggsave option gpi
+        rscriptpath      :   If given, used as the path to the Rscript executable file
         message_encoding :   Character encoding of the subprocess outputs
         **data      :   pandas data frames with names used inside the R script
 
@@ -129,7 +135,7 @@ def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tu
         outfile = os.path.join(tmpdir, "__ggout." + imageformat)
         ggwrite(plotcode, outfile, libs=libs,
                 savesize=savesize, width=width, height=height, scale=scale, units=units, dpi=dpi,
-                message_encoding=message_encoding, **data)
+                rscriptpath=rscriptpath, message_encoding=message_encoding, **data)
         if not os.path.isfile(outfile):
             raise RuntimeError("Graph file not found. Perhaps Rscript failed to produce the graph")
         
