@@ -279,8 +279,7 @@ print(config.rscript)
 
 
     
-![png](README_files/examples_12_0.png)
-    
+<img width=400 src="README_files/examples_12_0.png">
 
 
     /usr/bin/Rscript
