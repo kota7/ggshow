@@ -2,7 +2,7 @@
 Released: 2022-07-05
 
 - `ggshow`, `ggwrite`
-  - `rscriptpath` option added to specify the path to the Rscript command (default: None)
+  - `rscriptcommand` option added to specify the Rscript command name (default: None)
 
 ### ggshow v0.1.8
 Released: 2022-07-05

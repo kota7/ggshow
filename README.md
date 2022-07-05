@@ -217,14 +217,16 @@ ggplot(a, aes(x, y)) +
 %gg --help
 ```
 
-    Help on method gg in module ggshow:
+    Help on method gg in module ggshow.ggshow:
     
-    gg(line, cell=None) method of ggshow.GGMagic instance
+    gg(line, cell=None) method of ggshow.ggshow.GGMagic instance
         ::
         
           %gg [--help] [-s SAVESIZE SAVESIZE] [--scale SCALE] [--units UNITS]
-                  [--dpi DPI] [-w DISPWIDTH] [-h DISPHEIGHT]
-                  [--libs [LIBS [LIBS ...]]] [--data [DATA [DATA ...]]]
+                  [--dpi DPI] [--message_encoding MESSAGE_ENCODING]
+                  [--rscriptcommand RSCRIPTCOMMAND] [-w DISPWIDTH] [-h DISPHEIGHT]
+                  [--imageformat {png,jpeg,svg}] [--libs [LIBS [LIBS ...]]]
+                  [--data [DATA [DATA ...]]]
                   [plotcode [plotcode ...]]
         
         positional arguments:
@@ -237,10 +239,16 @@ ggplot(a, aes(x, y)) +
           --scale SCALE         ggsave option scale
           --units UNITS         ggsave option units
           --dpi DPI             ggsave option dpi
+          --message_encoding MESSAGE_ENCODING
+                                Encoding of the subprocess outputs
+          --rscriptcommand RSCRIPTCOMMAND
+                                Rscript command name
           -w DISPWIDTH, --dispwidth DISPWIDTH
                                 display width
           -h DISPHEIGHT, --dispheight DISPHEIGHT
                                 display width
+          --imageformat <{png,jpeg,svg}>
+                                imagefile format
           --libs <[LIBS [LIBS ...]]>
                                 R libraries to use
           --data <[DATA [DATA ...]]>
@@ -252,8 +260,15 @@ ggplot(a, aes(x, y)) +
 ```python
 # By default, we use 'Rscript' as the command to run R code.
 # If this is not a valid command on the environment,
-# we can still use the functions by
-# specifying the right one using set_rscript function.
+# we can specify the command by `rscriptcommand` option 
+ggshow("""
+  x <- c(1,2,3)
+  y <- c(4,5,6)
+  qplot(x, y, geom="line")
+""", savesize=(3, 2), rscriptcommand="/usr/bin/Rscript")
+
+
+# Or set the new command path as the default using set_rscript function.
 from ggshow import config, set_rscript
 
 set_rscript("/usr/bin/Rscript")  
@@ -261,6 +276,12 @@ print(config.rscript)
 # this is just the full path of the command on this environment
 # so the command will work in the same way
 ```
+
+
+    
+![png](examples_files/examples_12_0.png)
+    
+
 
     /usr/bin/Rscript
 
