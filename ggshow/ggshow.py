@@ -12,6 +12,7 @@ try:
     from IPython.display import Image, SVG, display_png, display_jpeg, display_svg
 except ImportError as e:
     print("'ggshow' function is disabled. Please import ipython to use it", file=sys.stderr)
+    Image = None  # this line only exist to avoid the error due to the return type hint of ggshow
 
 class config:
     rscript = "Rscript"
