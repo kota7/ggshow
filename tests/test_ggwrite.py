@@ -10,13 +10,13 @@ from ggshow import ggwrite
 
 
 class TestGGWrite(unittest.TestCase):
-    def test_qplot(self):
+    def test_basic(self):
         with TemporaryDirectory() as dirname:
             targetfile = os.path.join(dirname, "test.png")
             ggwrite("""
               x <- c(1,2,3)
               y <- c(4,5,6)
-              qplot(x, y, geom="line")
+              ggplot(mapping=aes(x, y)) + geom_line()
             """, targetfile, savesize=(3, 2))
             self.assertTrue(os.path.isfile(targetfile))
 
