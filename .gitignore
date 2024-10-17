@@ -1,6 +1,8 @@
 # files produced by the example code
 /foo.jpg
 /foo.png
+/bar.jpg
+/buz.jpeg
 # helper file for making the readme
 /examples.md
 /examples_files
