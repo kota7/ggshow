@@ -18,7 +18,7 @@ pip install -U ./ggshow
 
 ## Requirements
 
-- Python 3.5+
+- Python 3.7+ (but would work in some older versions)
 - `Rscript` command and the R environment with `ggplot2` package installed
 
 ## Functionalities
