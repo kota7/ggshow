@@ -19,10 +19,10 @@ jobs:
       matrix:
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
         r-version: [4.0, 'release']
-        os: [ubuntu-latest, ubuntu-20.04, windows-latest]
-        exclude:
-          - os: windows-latest
-            python-version: 3.8
+        os: [ubuntu-latest, ubuntu-20.04, macos-latest, macos-latest-xlarge, windows-latest]
+        #exclude:
+        #  - os: windows-latest
+        #    python-version: 3.8
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
