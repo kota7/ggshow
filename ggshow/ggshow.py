@@ -106,7 +106,9 @@ def ggwrite(plotcode: str, outfile: str, libs: tuple=(),
             print(p.stdout.decode(message_encoding, errors="replace"), file=sys.stdout, end="")
 
 
-def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tuple=(), imageformat: str="png", display: bool=True,
+def ggshow(plotcode: str, *,
+           outfile: str=None,
+           dispwidth: float=300, dispheight: float=None, libs: tuple=(), imageformat: str="png", display: bool=True,
            savesize: tuple=None, width: float=None, height: float=None, scale: float=1, units: str="in", dpi: int=300,
            rscriptcommand: str=None, message_encoding: str="utf-8", **data)-> Image:
     """
@@ -114,8 +116,9 @@ def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tu
 
     args:
         plotcode         :   R script to make a plot.
+        outfile          :   File path to save the image. If None, the image is saved as a temporary file.
         libs             :   A Sequence libraries to use inside the R script
-        imageformat      :   Imagefile format. One of ("png", "jpeg", "jpg", "svg"); default: "png"
+        imageformat      :   Imagefile format. One of ("png", "jpeg", "jpg", "svg"); default: "png". If savepath is given, not used.
         display          :   Display image on the notebook
         savesize         :   Graph size (width, height) to save
         width            :   Another way to specify savesize[0]
@@ -131,8 +134,15 @@ def ggshow(plotcode: str, dispwidth: float=300, dispheight: float=None, libs: tu
         IPython.core.Image
     """
     assert imageformat in ("png", "jpeg", "jpg", "svg"), "imageformat must be one of 'png', 'jpeg', 'jpg' and 'svg'"
+    # If the file path is given, we make sure that the directory exists.
+    if outfile is not None:
+        savedir = os.path.abspath(os.path.dirname(outfile))
+        os.makedirs(savedir, exist_ok=True)
     with TemporaryDirectory() as tmpdir:
-        outfile = os.path.join(tmpdir, "__ggout." + imageformat)
+        # Use the given file path if provided
+        # Otherwise use the temp file
+        if outfile is None:
+            outfile = os.path.join(tmpdir, "__ggout." + imageformat)
         ggwrite(plotcode, outfile, libs=libs,
                 savesize=savesize, width=width, height=height, scale=scale, units=units, dpi=dpi,
                 rscriptcommand=rscriptcommand, message_encoding=message_encoding, **data)
@@ -164,6 +174,7 @@ try:
         @magic_arguments()
         @argument("plotcode", type=str, nargs="*", help="R code")
         @argument("--help", action="store_true")
+        @argument("--outfile", type=str, default=None, help="File path to save the graph")
         @argument("-s", "--savesize", type=float, nargs=2, default=None, help="height, width")
         @argument("--scale", type=float, default=1, help="ggsave option scale")
         @argument("--units", type=str, default="in", help="ggsave option units")

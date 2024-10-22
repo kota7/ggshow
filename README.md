@@ -18,13 +18,13 @@ pip install -U ./ggshow
 
 ## Requirements
 
-- Python 3.5+
+- Python 3.7+ (but would work in some older versions)
 - `Rscript` command and the R environment with `ggplot2` package installed
 
 ## Functionalities
 
-- `ggshow`: Draw graphs using ggplot2 on R and return the Image object that you can show on Jupyter notebook
-- `ggwrite`: Draw graphs using ggplot2 on R and save it to a file.
+- `ggshow`: Draw graphs using ggplot2 on R and return the Image object that you can show on Jupyter notebook. From v0.1.10, we can also save the image to the file.
+- `ggwrite`: Draw graphs using ggplot2 on R and save it to a file (but not show on the notebook).
 - `%gg`, `%%gg`: ipython magic for drawing ggplot2 graph.
 
 
@@ -40,16 +40,14 @@ from ggshow import ggshow, ggwrite
 ggshow("""
   x <- c(1,2,3)
   y <- c(4,5,6)
-  qplot(x, y, geom="line")
+  ggplot(mapping=aes(x, y)) + geom_line()
 """, savesize=(3, 2))
+None
 ```
 
 
-
-
+<img width=400 src="README_files/examples_2_0.png">    
     
-<img width=400 src="README_files/examples_2_0.png">
-
 
 
 
@@ -71,71 +69,93 @@ ggshow("""
     geom_line(data=b, linetype="dashed", color="red") +
     theme_bw()
 """, dispwidth=500, savesize=(4, 2), a=df1, b=df2)
+None
 ```
 
 
-
-
-
+<img width=400 src="README_files/examples_3_0.png">    
     
-<img width=500 src="README_files/examples_3_0.png">
-    
-
 
 
 
 ```python
 # Example to save the graph to a file
-ggwrite("""
-    x <- c(1,2,3)
-    y <- c(4,5,6)
-    qplot(x, y, geom="line")
-""", "foo.jpg", savesize=(4, 2))
+ggshow("""
+  x <- c(1,2,3)
+  y <- c(4,5,6)
+  ggplot(mapping=aes(x, y)) + geom_line()
+""", outfile="foo.jpg", savesize=(3, 2))
 ```
+
+
+
+
+<img width=400 src="README_files/examples_4_0.jpg">    
+    
+
+
 
 
 ```python
-from IPython.display import Image
-Image("foo.jpg", width=400)
-```
+# Example to "only" save the graph to a file, not to show
+ggshow("""
+  x <- c(1,2,3)
+  y <- c(4,5,6)
+  ggplot(mapping=aes(x, y)) + geom_line()
+""", outfile="bar.jpg", savesize=(3, 2))
 
+# Confirm the file has been created
+from IPython.display import Image
+Image("bar.jpg", width=400)
+```
 
 
 
 
 <img width=400 src="README_files/examples_5_0.jpg">
+    
+
 
 
 
 ```python
 # Example to specify the image file format
-# But there may not be significant differences
+# But there may not be significant differences to human eyes
 # Default: png
 ggshow("""
   x <- c(1,2,3)
   y <- c(4,5,6)
-  qplot(x, y, geom="line") + ggtitle("PNG")
+  ggplot(mapping=aes(x, y)) + geom_line() + ggtitle("PNG")
 """, savesize=(3, 2), imageformat="png")
 
 ggshow("""
   x <- c(1,2,3)
   y <- c(4,5,6)
-  qplot(x, y, geom="line") + ggtitle("JPEG")
+  ggplot(mapping=aes(x, y)) + geom_line() + ggtitle("JPEG")
 """, savesize=(3, 2), imageformat="jpeg")
 
 ggshow("""
   x <- c(1,2,3)
   y <- c(4,5,6)
-  qplot(x, y, geom="line") + ggtitle("SVG")
+  ggplot(mapping=aes(x, y)) + geom_line() + ggtitle("SVG")
 """, savesize=(3, 2), imageformat="svg")
 None
 ```
 
 
+    
 <img width=400 src="README_files/examples_6_0.png">
+    
 
+
+
+    
 <img width=400 src="README_files/examples_6_1.jpg">
+    
 
+
+
+    
 <img width=400 src="README_files/examples_6_2.svg">
     
 
@@ -149,14 +169,15 @@ None
 
 ```python
 ## line magic
-%gg qplot(1, 2) -s 4 3 --dispwidth 300
+%gg ggplot(mapping=aes(1, 2)) + geom_point() -s 4 3 --dispwidth 300 --outfile buz.jpeg
 ```
 
 
 
 
     
-<img width=400 src="README_files/examples_8_0.png">
+<img width=400 src="README_files/examples_8_0.jpg">
+
     
 
 
@@ -207,6 +228,7 @@ ggplot(a, aes(x, y)) +
 
     
 <img width=400 src="README_files/examples_10_0.png">
+
     
 
 
@@ -221,19 +243,20 @@ ggplot(a, aes(x, y)) +
     
     gg(line, cell=None) method of ggshow.ggshow.GGMagic instance
         ::
-        
-          %gg [--help] [-s SAVESIZE SAVESIZE] [--scale SCALE] [--units UNITS]
-                  [--dpi DPI] [--message_encoding MESSAGE_ENCODING]
+    
+          %gg [--help] [--outfile OUTFILE] [-s SAVESIZE SAVESIZE] [--scale SCALE]
+                  [--units UNITS] [--dpi DPI] [--message_encoding MESSAGE_ENCODING]
                   [--rscriptcommand RSCRIPTCOMMAND] [-w DISPWIDTH] [-h DISPHEIGHT]
-                  [--imageformat {png,jpeg,svg}] [--libs [LIBS [LIBS ...]]]
-                  [--data [DATA [DATA ...]]]
-                  [plotcode [plotcode ...]]
-        
+                  [--imageformat {png,jpeg,svg}] [--libs [LIBS ...]]
+                  [--data [DATA ...]]
+                  [plotcode ...]
+    
         positional arguments:
           plotcode              R code
-        
-        optional arguments:
+    
+        options:
           --help
+          --outfile OUTFILE     File path to save the graph
           -s <SAVESIZE SAVESIZE>, --savesize <SAVESIZE SAVESIZE>
                                 height, width
           --scale SCALE         ggsave option scale
@@ -249,10 +272,8 @@ ggplot(a, aes(x, y)) +
                                 display width
           --imageformat <{png,jpeg,svg}>
                                 imagefile format
-          --libs <[LIBS [LIBS ...]]>
-                                R libraries to use
-          --data <[DATA [DATA ...]]>
-                                data frames mapping as {name in r}={name in python}
+          --libs <[LIBS ...]>   R libraries to use
+          --data <[DATA ...]>   data frames mapping as {name in r}={name in python}
     
 
 
@@ -264,14 +285,14 @@ ggplot(a, aes(x, y)) +
 ggshow("""
   x <- c(1,2,3)
   y <- c(4,5,6)
-  qplot(x, y, geom="line")
-""", savesize=(3, 2), rscriptcommand="/usr/bin/Rscript")
+  ggplot(mapping=aes(x, y)) + geom_line()
+""", savesize=(3, 2), rscriptcommand="/usr/local/bin/Rscript")
 
 
 # Or set the new command path as the default using set_rscript function.
 from ggshow import config, set_rscript
 
-set_rscript("/usr/bin/Rscript")  
+set_rscript("/usr/local/bin/Rscript")  
 print(config.rscript)
 # this is just the full path of the command on this environment
 # so the command will work in the same way
@@ -280,7 +301,7 @@ print(config.rscript)
 
     
 <img width=400 src="README_files/examples_12_0.png">
+    
 
 
-    /usr/bin/Rscript
-
+    /usr/local/bin/Rscript
