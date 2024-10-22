@@ -1,3 +1,8 @@
+### ggshow v0.1.10
+Released: 2024-10-22
+
+- `ggshow` no has the `outfile` option, by which the image is saved as a file as well (default: None, where the file is not saved)
+
 ### ggshow v0.1.9
 Released: 2022-07-05
 
